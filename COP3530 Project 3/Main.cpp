@@ -10,6 +10,7 @@
 #include <DropdownMenu.h>
 #include <NavigationMenu.h>
 #include <TitleBar.h>
+#include "DataReader.h"
 
 using std::cout;
 using std::endl;
@@ -20,11 +21,10 @@ void menuClickTest(std::string name) {
 	cout << name << " clicked" << endl;
 }
 
-float line(float x) {
-	return 0.5 * x;
-}
-
 int main() {
+	/*DataReader reader;
+	reader.read("res\\vehicles.csv", 1000);*/
+
 	sf::ContextSettings settings;
 	settings.antialiasingLevel = 8;
 
@@ -58,51 +58,56 @@ int main() {
 	sf::Font monospace_font;
 	cout << "Courier Font Loaded: " << monospace_font.loadFromFile("res\\Courier New.TTF") << endl;
 
-	DropdownMenu file_menu(0, 5, 70, 30, font);
-	file_menu.SetName("File");
-	file_menu.SetColor(sf::Color(50, 50, 50));
-	file_menu.SetTextColor(sf::Color::White);
-
-	file_menu.AddItem("New");
-	file_menu.AddItem("Open");
-	file_menu.AddItem("Save");
-	file_menu.AddItem("Save As");
-
-	DropdownMenu properties_menu(71, 5, 120, 30, font);
-	properties_menu.SetName("Properties");
-	properties_menu.SetColor(sf::Color(50, 50, 50));
-	properties_menu.SetTextColor(sf::Color::White);
-
-	properties_menu.AddItem("Bla");
-	properties_menu.AddItem("Bla");
-
 	//------------------------Set Up for the Side Menu------------------------//
 	NavigationMenu side_menu(0, 0, sideBar.GetWidth(), 30, font);
-	side_menu.SetName("Name");
+	side_menu.SetName("Filter");
 	side_menu.Open();
 	side_menu.SetColor(sf::Color(50, 50, 50));
 	side_menu.SetTextColor(sf::Color::White);
 
-	side_menu.AddItem("Item 1");
-	side_menu.AddItem("Item 2");
-	side_menu.AddItem("Item 3");
+	side_menu.AddItem("Brand");
+	side_menu.AddItem("Brand.Lexus");
+	side_menu.AddItem("Brand.Toyota");
+	side_menu.AddItem("Brand.BMW");
 
-	side_menu.AddItem("Item 1.SubItem 1");
-	side_menu.AddItem("Item 1.SubItem 2");
-	side_menu.AddItem("Item 1.SubItem 3");
+	side_menu.AddItem("Price");
+	side_menu.AddItem("Price.1,000-9,999");
+	side_menu.AddItem("Price.10,000-19,999");
+	side_menu.AddItem("Price.20,000-29,999");
 
-	side_menu.AddItem("Item 2.Potato");
-	side_menu.AddItem("Item 2.Fire");
-	side_menu.AddItem("Item 2.Hello");
+	side_menu.AddItem("Year");
+	for (int i = 2000; i <= 2021; i++) {
+		side_menu.AddItem("Year." + std::to_string(i));
+	}
 
-	side_menu.AddItem("Item 3.Hi");
+	side_menu.AddItem("Cylinders");
+	side_menu.AddItem("Cylinders.2");
+	side_menu.AddItem("Cylinders.4");
+	side_menu.AddItem("Cylinders.6");
+	side_menu.AddItem("Cylinders.8");
 
-	side_menu.OnClick("Item 1.SubItem 1", menuClickTest);
-	side_menu.OnClick("Item 2", menuClickTest);
+	side_menu.OnClick("Brand.Lexus", menuClickTest);
+	side_menu.OnClick("Brand.Toyota", menuClickTest);
 
+	//---------------------------------------------------------------------------------//
+
+	TextBox searchBox(50, 50, 600, 30, window);
+	searchBox.SetFont(monospace_font);
+	searchBox.SetCharacterLimit(40);
+	searchBox.SetColor(sf::Color(50, 50, 50));
+	searchBox.SetTextColor(sf::Color::White);
+	searchBox.SetBorderColor(sf::Color::Black);
+
+	Button searchButton(680, 50, 100, 30);
+	searchButton.SetText("Search");
+	searchButton.SetFont(font);
+	searchButton.SetColor(sf::Color(252, 127, 0));
+	searchButton.SetTextColor(sf::Color::White);
+	searchButton.SetBorderColor(sf::Color::Black);
+
+	panel.AddObject(&searchBox, 0);
+	panel.AddObject(&searchButton, 0);
 	sideBar.AddObject(&side_menu, 0);
-	windowPanel.AddObject(&file_menu, 0);
-	windowPanel.AddObject(&properties_menu, 0);
 
 	sf::Color focused_color = sf::Color(0, 76, 135);
 	sf::Color unfocused_color = sf::Color(100, 100, 100);
