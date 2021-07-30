@@ -21,13 +21,6 @@ void SearchCard::Draw(sf::RenderTarget& target) {
 	sf::Color original_color = card.getFillColor();
 
 	if (MouseInBounds(mouse_x, mouse_y)) {
-		float tint_factor = 0.1f;
-		sf::Color lighter = sf::Color(original_color.r + (int)((255 - original_color.r) * tint_factor),
-			original_color.g + (int)((255 - original_color.g) * tint_factor),
-			original_color.b + (int)((255 - original_color.b) * tint_factor));
-
-		card.setFillColor(lighter);
-
 		if (has_focus && mouse_held) {
 			float shade_factor = 0.1f;
 			sf::Color darker = sf::Color((int)(original_color.r * (1 - shade_factor)),
