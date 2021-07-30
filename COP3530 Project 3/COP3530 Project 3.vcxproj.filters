@@ -21,9 +21,15 @@
     <ClCompile Include="DataReader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SearchCard.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DataReader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SearchCard.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

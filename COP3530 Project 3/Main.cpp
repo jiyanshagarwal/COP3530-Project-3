@@ -11,6 +11,7 @@
 #include <NavigationMenu.h>
 #include <TitleBar.h>
 #include "DataReader.h"
+#include "SearchCard.h"
 
 using std::cout;
 using std::endl;
@@ -24,6 +25,8 @@ void menuClickTest(std::string name) {
 int main() {
 	/*DataReader reader;
 	reader.read("res\\vehicles.csv", 1000);*/
+
+	SearchCard card(50, 300, 730, 200, "res\\truck.jpg");
 
 	sf::ContextSettings settings;
 	settings.antialiasingLevel = 8;
@@ -107,6 +110,7 @@ int main() {
 
 	panel.AddObject(&searchBox, 0);
 	panel.AddObject(&searchButton, 0);
+	panel.AddObject(&card, 0);
 	sideBar.AddObject(&side_menu, 0);
 
 	sf::Color focused_color = sf::Color(0, 76, 135);
