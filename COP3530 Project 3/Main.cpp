@@ -26,8 +26,6 @@ int main() {
 	/*DataReader reader;
 	reader.read("res\\vehicles.csv", 1000);*/
 
-	SearchCard card(50, 300, 730, 200, "res\\truck.jpg");
-
 	sf::ContextSettings settings;
 	settings.antialiasingLevel = 8;
 
@@ -107,6 +105,8 @@ int main() {
 	searchButton.SetColor(sf::Color(252, 127, 0));
 	searchButton.SetTextColor(sf::Color::White);
 	searchButton.SetBorderColor(sf::Color::Black);
+
+	SearchCard card(50, 300, 730, 200, "res\\truck.jpg", window);
 
 	panel.AddObject(&searchBox, 0);
 	panel.AddObject(&searchButton, 0);

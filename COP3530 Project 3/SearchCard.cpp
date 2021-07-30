@@ -1,10 +1,25 @@
 #include "SearchCard.h"
 
-SearchCard::SearchCard(float x, float y, float width, float height, std::string photo_filename) : Drawable(x, y, width, height) {
+SearchCard::SearchCard(float x, float y, float width, float height, std::string photo_filename, sf::RenderWindow& window) 
+	: Drawable(x, y, width, height), window(window) {
 	border_width = width / 50;
 
 	photo_texture.loadFromFile(photo_filename);
 	photo_texture.setSmooth(true);
+
+	cursor_changed = false;
+}
+
+void SearchCard::Tick() {
+	if (this->MouseInBounds(mouse_x, mouse_y) && cursor.loadFromSystem(sf::Cursor::Hand)) {
+		window.setMouseCursor(cursor);
+		cursor_changed = true;
+	}
+	else if (cursor_changed) {
+		cursor.loadFromSystem(sf::Cursor::Arrow);
+		window.setMouseCursor(cursor);
+		cursor_changed = false;
+	}
 }
 
 void SearchCard::Draw(sf::RenderTarget& target) {
