@@ -48,6 +48,7 @@ int main() {
 		vehiclesByPrice.insert(std::pair<int, std::string>(thisPrice, info));
 	}
 
+#pragma region <Main Window Setup>
 	sf::ContextSettings settings;
 	settings.antialiasingLevel = 8;
 
@@ -74,7 +75,9 @@ int main() {
 	sideBar.SetBorderWidth(-1);
 	sideBar.XScroll(true);
 	sideBar.YScroll(true);
+#pragma endregion
 
+#pragma region <Load Fonts>
 	sf::Font arial_font;
 	cout << "Arial Font Loaded: " << arial_font.loadFromFile("res\\arial.TTF") << endl;
 
@@ -83,8 +86,9 @@ int main() {
 
 	sf::Font courier_font;
 	cout << "Courier Font Loaded: " << courier_font.loadFromFile("res\\Courier New.TTF") << endl;
+#pragma endregion
 
-	//------------------------Set Up for the Side Menu------------------------//
+#pragma region <Setup for the Side Menu>
 	NavigationMenu side_menu(0, 0, sideBar.GetWidth(), 30, arial_rounded_MT_bold);
 	side_menu.SetName("Filter");
 	side_menu.Open();
@@ -114,8 +118,7 @@ int main() {
 
 	side_menu.OnClick("Brand.Lexus", menuClickTest);
 	side_menu.OnClick("Brand.Toyota", menuClickTest);
-
-	//---------------------------------------------------------------------------------//
+#pragma endregion
 
 	TextBox searchBox(50, 50, 600, 30, window);
 	searchBox.SetFont(courier_font);
@@ -141,7 +144,6 @@ int main() {
 	data.car_name = "Ford F-150";
 	data.car_VIN = "AJJS23298392AAKIQ";
 	data.car_price = "2402.67";
-	//data.car_description = "192k miles brand new TSLs 4x4 jeep xj. 4x4 works\namazing. Hot heat, ac needs recharged. Text for more\ninfo. TEXT ONLY. Cash only!";
 	data.car_description = "192k miles brand new TSLs 4x4 jeep xj. 4x4 works amazing. Hot heat, ac needs recharged. Text for more info. TEXT ONLY. Cash only!";
 
 	searchCards.AddCard(data);
@@ -156,6 +158,7 @@ int main() {
 	sf::Color focused_color = sf::Color(0, 76, 135);
 	sf::Color unfocused_color = sf::Color(100, 100, 100);
 
+#pragma region <Event Loop>
 	while (window.isOpen()) {
 		sf::Event event;
 		while (window.pollEvent(event)) {
@@ -177,6 +180,7 @@ int main() {
 
 		window.display();
 	}
+#pragma endregion
 
 	return 0;
 }
