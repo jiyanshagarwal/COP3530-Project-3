@@ -11,7 +11,8 @@
 #include <NavigationMenu.h>
 #include <TitleBar.h>
 #include "DataReader.h"
-#include "SearchCard.h"
+#include "CardManager.h"
+#include "CarData.h"
 
 using std::cout;
 using std::endl;
@@ -74,14 +75,17 @@ int main() {
 	sideBar.XScroll(true);
 	sideBar.YScroll(true);
 
-	sf::Font font;
-	cout << "Arial Font Loaded: " << font.loadFromFile("res\\Arial Rounded MT Bold.TTF") << endl;
+	sf::Font arial_font;
+	cout << "Arial Font Loaded: " << arial_font.loadFromFile("res\\arial.TTF") << endl;
 
-	sf::Font monospace_font;
-	cout << "Courier Font Loaded: " << monospace_font.loadFromFile("res\\Courier New.TTF") << endl;
+	sf::Font arial_rounded_MT_bold;
+	cout << "Arial Rounded MT Bold Loaded: " << arial_rounded_MT_bold.loadFromFile("res\\Arial Rounded MT Bold.TTF") << endl;
+
+	sf::Font courier_font;
+	cout << "Courier Font Loaded: " << courier_font.loadFromFile("res\\Courier New.TTF") << endl;
 
 	//------------------------Set Up for the Side Menu------------------------//
-	NavigationMenu side_menu(0, 0, sideBar.GetWidth(), 30, font);
+	NavigationMenu side_menu(0, 0, sideBar.GetWidth(), 30, arial_rounded_MT_bold);
 	side_menu.SetName("Filter");
 	side_menu.Open();
 	side_menu.SetColor(sf::Color(50, 50, 50));
@@ -114,7 +118,7 @@ int main() {
 	//---------------------------------------------------------------------------------//
 
 	TextBox searchBox(50, 50, 600, 30, window);
-	searchBox.SetFont(monospace_font);
+	searchBox.SetFont(courier_font);
 	searchBox.SetCharacterLimit(40);
 	searchBox.SetColor(sf::Color(50, 50, 50));
 	searchBox.SetTextColor(sf::Color::White);
@@ -123,16 +127,29 @@ int main() {
 
 	Button searchButton(680, 50, 100, 30);
 	searchButton.SetText("Search");
-	searchButton.SetFont(font);
+	searchButton.SetFont(arial_rounded_MT_bold);
 	searchButton.SetColor(sf::Color(252, 127, 0));
 	searchButton.SetTextColor(sf::Color::White);
 	searchButton.SetBorderColor(sf::Color::Black);
 
-	SearchCard card(50, 300, 730, 200, "res\\truck.jpg", window);
+	CardManager searchCards(50, 150, 730, 530, 200, arial_font, &window);
+	searchCards.SetColor(sf::Color(70, 70, 70));
+	searchCards.YScroll(true);
+	
+	CarData data;
+	data.page_url = "https://auburn.craigslist.org";
+	data.car_name = "Ford F-150";
+	data.car_VIN = "AJJS23298392AAKIQ";
+	data.car_price = "2402.67";
+	data.car_description = "192k miles brand new TSLs 4x4 jeep xj. 4x4 works\namazing. Hot heat, ac needs recharged. Text for more\ninfo. TEXT ONLY. Cash only!";
+
+	searchCards.AddCard(data);
+	searchCards.AddCard(data);
+	searchCards.AddCard(data);
 
 	panel.AddObject(&searchBox, 0);
 	panel.AddObject(&searchButton, 0);
-	panel.AddObject(&card, 0);
+	panel.AddObject(&searchCards, 0);
 	sideBar.AddObject(&side_menu, 0);
 
 	sf::Color focused_color = sf::Color(0, 76, 135);

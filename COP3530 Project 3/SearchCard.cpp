@@ -1,24 +1,32 @@
 #include "SearchCard.h"
+#include <Windows.h>
 
-SearchCard::SearchCard(float x, float y, float width, float height, std::string photo_filename, sf::RenderWindow& window) 
+SearchCard::SearchCard(float x, float y, float width, float height, CarData data, sf::RenderWindow* window)
 	: Drawable(x, y, width, height), window(window) {
 	border_width = width / 50;
-
-	photo_texture.loadFromFile(photo_filename);
 	photo_texture.setSmooth(true);
 
+	this->data = data;
 	cursor_changed = false;
 }
 
 void SearchCard::Tick() {
 	if (this->MouseInBounds(mouse_x, mouse_y) && cursor.loadFromSystem(sf::Cursor::Hand)) {
-		window.setMouseCursor(cursor);
+		window->setMouseCursor(cursor);
 		cursor_changed = true;
 	}
 	else if (cursor_changed) {
 		cursor.loadFromSystem(sf::Cursor::Arrow);
-		window.setMouseCursor(cursor);
+		window->setMouseCursor(cursor);
 		cursor_changed = false;
+	}
+}
+
+void SearchCard::Event(sf::Event& event) {
+	Drawable::Event(event);
+
+	if (event.type == sf::Event::MouseButtonReleased && MouseInBounds(mouse_x, mouse_y) && has_focus && !data.page_url.empty()) {
+		ShellExecuteA(0, 0, data.page_url.c_str(), 0, 0, 1);
 	}
 }
 
@@ -33,6 +41,7 @@ void SearchCard::Draw(sf::RenderTarget& target) {
 	photo.setTexture(&photo_texture);
 	photo.setPosition(x + border_width, y + border_width);
 
+	//------------------Change Color when Clicked------------------//
 	sf::Color original_color = card.getFillColor();
 
 	if (MouseInBounds(mouse_x, mouse_y)) {
@@ -43,7 +52,24 @@ void SearchCard::Draw(sf::RenderTarget& target) {
 			card.setFillColor(darker);
 		}
 	}
+	//------------------------------------------------------------//
+
+	sf::Text name(data.car_name, font, 32);
+	sf::Text VIN(data.car_VIN, font, 12);
+	sf::Text price("$" + data.car_price, font, 24);
+	sf::Text description(data.car_description, font, 16);
+	
+	name.setPosition(photo.getPosition().x + photo.getSize().x + border_width, y + border_width);
+	VIN.setPosition(photo.getPosition().x + photo.getSize().x + border_width, y + border_width + 40);
+	price.setPosition(x + width - 130, y + border_width);
+	description.setPosition(photo.getPosition().x + photo.getSize().x + border_width, y + border_width + 90);
+
+	price.setFillColor(sf::Color(252, 127, 0));
 
 	target.draw(card);
 	target.draw(photo);
+	target.draw(name);
+	target.draw(VIN);
+	target.draw(price);
+	target.draw(description);
 }
