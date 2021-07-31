@@ -18,6 +18,7 @@ bool DataReader::read(std::string filename, unsigned int num_lines) {
 				line = line.substr(comma_index + 1);
 				vec.push_back(field);
 			}
+			vehicles.push_back(vec);
 		}
 
 		file.close();

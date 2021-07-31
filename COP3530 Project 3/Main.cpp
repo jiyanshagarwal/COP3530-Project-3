@@ -23,8 +23,29 @@ void menuClickTest(std::string name) {
 }
 
 int main() {
-	/*DataReader reader;
-	reader.read("res\\vehicles.csv", 1000);*/
+	DataReader reader;
+	reader.read("res\\small_vehicles_data.csv", 1000);
+
+	std::map<int, std::string> vehiclesByPrice;
+
+	DataReader::FieldIndex price = DataReader::PRICE;
+	DataReader::FieldIndex year = DataReader::YEAR;
+	DataReader::FieldIndex manufactuerer = DataReader::MANUFACTUERER;
+	DataReader::FieldIndex model = DataReader::MODEL;
+	DataReader::FieldIndex odometer = DataReader::ODOMETER;
+
+	for (auto& it : reader.vehicles) {
+		int thisPrice = stoi(it[price]);
+		std::string info;
+		info.append(it[year]);
+		info.append(" ");
+		info.append(it[manufactuerer]);
+		info.append(" ");
+		info.append(it[model]);
+		info.append(" Mileage: ");
+		info.append(it[odometer]);
+		vehiclesByPrice.insert(std::pair<int, std::string>(thisPrice, info));
+	}
 
 	sf::ContextSettings settings;
 	settings.antialiasingLevel = 8;
