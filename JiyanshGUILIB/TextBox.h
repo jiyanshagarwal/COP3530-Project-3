@@ -26,6 +26,7 @@ public:
 	void SetColor(sf::Color color);
 	void SetBorderColor(sf::Color color);
 	void SetBorderWidth(float num);
+	void SetHighlightColor(sf::Color color);
 	void SetCharacterLimit(int num);		//If num < 0, there is no limit
 	void SetCaretPosition(unsigned int num);
 
@@ -40,6 +41,7 @@ public:
 	sf::Color GetColor() const;
 	sf::Color GetBorderColor() const;
 	float GetBorderWidth() const;
+	sf::Color GetHighlightColor() const;
 	int GetCharacterLimit() const;
 	bool hasCharacterLimit() const;
 	unsigned int GetCaretPosition() const;
@@ -63,6 +65,7 @@ private:
 
 	sf::Text visible_text;
 	sf::RectangleShape textbox;
+	sf::Color highlight_color;
 
 	void KeyPressed(int key);
 	void KeyReleased(int key);

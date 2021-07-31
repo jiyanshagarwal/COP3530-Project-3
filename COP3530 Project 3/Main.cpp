@@ -98,6 +98,7 @@ int main() {
 	searchBox.SetColor(sf::Color(50, 50, 50));
 	searchBox.SetTextColor(sf::Color::White);
 	searchBox.SetBorderColor(sf::Color::Black);
+	searchBox.SetHighlightColor(sf::Color(100, 150, 180, 150));
 
 	Button searchButton(680, 50, 100, 30);
 	searchButton.SetText("Search");
