@@ -88,12 +88,12 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>SFML_STATIC;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\Jiyansh User\Desktop\University of Florida File\UF Year 2\UF Summer C 2021\COP3530 Data Structures and Algorithms\COP3530 Project 3\JiyanshGUILIB;C:\Users\Jiyansh User\Documents\SFML-2.5.1-windows-vc15-32-bit\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Jared\Downloads\SFML-2.5.1-windows-vc15-32-bit\SFML-2.5.1\include;C:\Users\Jared\source\repos\COP3530-Project-3\JiyanshGUILIB</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Users\Jiyansh User\Desktop\University of Florida File\UF Year 2\UF Summer C 2021\COP3530 Data Structures and Algorithms\COP3530 Project 3\JiyanshGUILIB;C:\Users\Jiyansh User\Documents\SFML-2.5.1-windows-vc15-32-bit\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Users\Jared\source\repos\COP3530-Project-3\JiyanshGUILIB;C:\Users\Jared\Downloads\SFML-2.5.1-windows-vc15-32-bit\SFML-2.5.1\lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>sfml-graphics-s-d.lib;sfml-window-s-d.lib;sfml-system-s-d.lib;opengl32.lib;freetype.lib;winmm.lib;gdi32.lib;sfml-main-d.lib;kernel32.lib;user32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;Jiyansh_GUI_LIB-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -122,13 +122,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>SFML_STATIC;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\Jiyansh User\Desktop\University of Florida File\UF Year 2\UF Summer C 2021\COP3530 Data Structures and Algorithms\COP3530 Project 3\JiyanshGUILIB;C:\Users\Jiyansh User\Documents\SFML-2.5.1-windows-vc15-32-bit\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Jared\Downloads\SFML-2.5.1-windows-vc15-320-bit\include;C:\Users\Jared\source\repos\COP3530-Project-3\JiyanshGUILIB</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>sfml-graphics-s-d.lib;sfml-window-s-d.lib;sfml-system-s-d.lib;opengl32.lib;freetype.lib;winmm.lib;gdi32.lib;sfml-main-d.lib;kernel32.lib;user32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;Jiyansh_GUI_LIB-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\Users\Jiyansh User\Desktop\University of Florida File\UF Year 2\UF Summer C 2021\COP3530 Data Structures and Algorithms\COP3530 Project 3\JiyanshGUILIB;C:\Users\Jiyansh User\Documents\SFML-2.5.1-windows-vc15-32-bit\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Users\Jared\source\repos\COP3530-Project-3\JiyanshGUILIB;C:\Users\Jared\Downloads\SFML-2.5.1-windows-vc15-32-bit\SFML-2.5.1\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
