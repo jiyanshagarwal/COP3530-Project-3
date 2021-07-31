@@ -27,25 +27,50 @@ int main() {
 	DataReader reader;
 	reader.read("res\\small_vehicles_data.csv", 1000);
 
-	std::map<int, std::string> vehiclesByPrice;
+	std::map<int, std::vector<CarData>> vehiclesByPrice;
+	std::map<std::string, std::vector<CarData>> vehiclesByBrand;
 
-	DataReader::FieldIndex price = DataReader::PRICE;
 	DataReader::FieldIndex year = DataReader::YEAR;
 	DataReader::FieldIndex manufactuerer = DataReader::MANUFACTUERER;
 	DataReader::FieldIndex model = DataReader::MODEL;
-	DataReader::FieldIndex odometer = DataReader::ODOMETER;
-
+	DataReader::FieldIndex vin = DataReader::VIN;
+	DataReader::FieldIndex price = DataReader::PRICE;
+	DataReader::FieldIndex description = DataReader::DESCRIPTION;
+	DataReader::FieldIndex image_url = DataReader::IMAGE_URL;
+	DataReader::FieldIndex page_url = DataReader::URL;
+	
 	for (auto& it : reader.vehicles) {
-		int thisPrice = stoi(it[price]);
-		std::string info;
-		info.append(it[year]);
-		info.append(" ");
-		info.append(it[manufactuerer]);
-		info.append(" ");
-		info.append(it[model]);
-		info.append(" Mileage: ");
-		info.append(it[odometer]);
-		vehiclesByPrice.insert(std::pair<int, std::string>(thisPrice, info));
+		CarData temp;
+		std::vector<CarData> DataVector;
+		temp.car_name.append(it[year]);
+		temp.car_name.append(" ");
+		temp.car_name.append(it[manufactuerer]);
+		temp.car_name.append(" ");
+		temp.car_name.append(it[model]);
+		temp.car_VIN.append(it[vin]);
+		temp.car_price.append(it[price]);
+		temp.car_description.append(it[description]);
+		temp.image_url.append(it[image_url]);
+		temp.page_url.append(it[page_url]);
+
+		if (!vehiclesByBrand.count(it[manufactuerer])) {
+			DataVector.push_back(temp);
+		}
+		else {
+			DataVector = vehiclesByBrand.at(it[manufactuerer]);
+			DataVector.push_back(temp);
+		}
+		vehiclesByBrand.insert(std::pair<std::string, std::vector<CarData>>(temp.car_name, DataVector));
+		DataVector.clear();
+
+		if (!vehiclesByPrice.count(stoi(it[price]))) {
+			DataVector.push_back(temp);
+		}
+		else {
+			DataVector = vehiclesByPrice.at(stoi(it[price]));
+			DataVector.push_back(temp);
+		}
+		vehiclesByPrice.insert(std::pair<int, std::vector<CarData>>(stoi(temp.car_price), DataVector));
 	}
 
 #pragma region <Main Window Setup>
