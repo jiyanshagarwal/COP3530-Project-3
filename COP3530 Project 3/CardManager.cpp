@@ -12,10 +12,7 @@ CardManager::~CardManager() {
 }
 
 void CardManager::AddCard(CarData data) {
-	SearchCard* card = new SearchCard(5, prev_card_y + card_height + 20, width - 30, card_height, data, window);
-	card->font = font;
-	AddObject(card, 0);
-
+	AddObject(new SearchCard(5, prev_card_y + card_height + 20, width - 30, card_height, data, font, window), 0);
 	prev_card_y = prev_card_y + card_height + 20;
 }
 

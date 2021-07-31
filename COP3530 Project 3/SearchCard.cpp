@@ -1,13 +1,17 @@
 #include "SearchCard.h"
 #include <Windows.h>
 
-SearchCard::SearchCard(float x, float y, float width, float height, CarData data, sf::RenderWindow* window)
+SearchCard::SearchCard(float x, float y, float width, float height, CarData data, const sf::Font& font, sf::RenderWindow* window)
 	: Drawable(x, y, width, height), window(window) {
+	this->data = data;
 	border_width = width / 50;
 	photo_texture.setSmooth(true);
-
-	this->data = data;
+	this->font = font;
 	cursor_changed = false;
+
+	//This part adds newline characters to the string to make it fit in the box.
+	float description_space = (2 * width / 3) - 3 * border_width;
+	this->data.car_description = StringWrap(data.car_description, description_space, 16);
 }
 
 void SearchCard::Tick() {
@@ -58,7 +62,7 @@ void SearchCard::Draw(sf::RenderTarget& target) {
 	sf::Text VIN(data.car_VIN, font, 12);
 	sf::Text price("$" + data.car_price, font, 24);
 	sf::Text description(data.car_description, font, 16);
-	
+
 	name.setPosition(photo.getPosition().x + photo.getSize().x + border_width, y + border_width);
 	VIN.setPosition(photo.getPosition().x + photo.getSize().x + border_width, y + border_width + 40);
 	price.setPosition(x + width - 130, y + border_width);
@@ -72,4 +76,30 @@ void SearchCard::Draw(sf::RenderTarget& target) {
 	target.draw(VIN);
 	target.draw(price);
 	target.draw(description);
+}
+
+float SearchCard::GetTextWidth(std::string str, unsigned int character_size) const {
+	sf::Text text(str, font, character_size);
+	return text.getGlobalBounds().width;
+}
+
+std::string SearchCard::StringWrap(std::string str, float width, unsigned int character_size) const {
+	float str_width = GetTextWidth(str, character_size);
+
+	if (str_width > width) {
+		int line_length = std::floor(width * str.size() / str_width);
+
+		for (int i = 1; i * line_length < str.size(); i++) {
+			int newline_pos = str.rfind(" ", i * line_length);
+
+			if (newline_pos == std::string::npos) {
+				newline_pos = i * line_length;
+			}
+
+			str[newline_pos] = '\n';
+
+		}
+	}
+
+	return str;
 }

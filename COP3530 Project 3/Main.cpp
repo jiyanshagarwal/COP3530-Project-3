@@ -141,7 +141,8 @@ int main() {
 	data.car_name = "Ford F-150";
 	data.car_VIN = "AJJS23298392AAKIQ";
 	data.car_price = "2402.67";
-	data.car_description = "192k miles brand new TSLs 4x4 jeep xj. 4x4 works\namazing. Hot heat, ac needs recharged. Text for more\ninfo. TEXT ONLY. Cash only!";
+	//data.car_description = "192k miles brand new TSLs 4x4 jeep xj. 4x4 works\namazing. Hot heat, ac needs recharged. Text for more\ninfo. TEXT ONLY. Cash only!";
+	data.car_description = "192k miles brand new TSLs 4x4 jeep xj. 4x4 works amazing. Hot heat, ac needs recharged. Text for more info. TEXT ONLY. Cash only!";
 
 	searchCards.AddCard(data);
 	searchCards.AddCard(data);
