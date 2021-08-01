@@ -74,6 +74,17 @@ int main() {
 		vehiclesByPrice.insert(std::pair<int, std::vector<CarData>>(stoi(temp.car_price), DataVector));
 	}
 
+#pragma region <Load Fonts>
+	sf::Font arial_font;
+	cout << "Arial Font Loaded: " << arial_font.loadFromFile("res\\arial.TTF") << endl;
+
+	sf::Font arial_rounded_MT_bold;
+	cout << "Arial Rounded MT Bold Loaded: " << arial_rounded_MT_bold.loadFromFile("res\\Arial Rounded MT Bold.TTF") << endl;
+
+	sf::Font courier_font;
+	cout << "Courier Font Loaded: " << courier_font.loadFromFile("res\\Courier New.TTF") << endl;
+#pragma endregion
+
 #pragma region <Main Window Setup>
 	sf::ContextSettings settings;
 	settings.antialiasingLevel = 8;
@@ -101,18 +112,18 @@ int main() {
 	sideBar.SetBorderWidth(-1);
 	sideBar.XScroll(true);
 	sideBar.YScroll(true);
+
+	sf::Text title("Find a Car", arial_rounded_MT_bold, 16);
+	title.setPosition(50, 10);
+
+	sf::Texture logo_texture;
+	logo_texture.loadFromFile("res\\Logo.png");
+	sf::RectangleShape logo(sf::Vector2f(30, 30));
+	logo.setTexture(&logo_texture);
+	logo.setPosition(10, 5);
 #pragma endregion
 
-#pragma region <Load Fonts>
-	sf::Font arial_font;
-	cout << "Arial Font Loaded: " << arial_font.loadFromFile("res\\arial.TTF") << endl;
 
-	sf::Font arial_rounded_MT_bold;
-	cout << "Arial Rounded MT Bold Loaded: " << arial_rounded_MT_bold.loadFromFile("res\\Arial Rounded MT Bold.TTF") << endl;
-
-	sf::Font courier_font;
-	cout << "Courier Font Loaded: " << courier_font.loadFromFile("res\\Courier New.TTF") << endl;
-#pragma endregion
 
 #pragma region <Setup for the Side Menu>
 	NavigationMenu side_menu(0, 0, sideBar.GetWidth(), 30, arial_rounded_MT_bold);
@@ -210,6 +221,8 @@ int main() {
 		windowPanel.SetMousePosition((float)sf::Mouse::getPosition(window).x, (float)sf::Mouse::getPosition(window).y);
 		windowPanel.Tick();
 		windowPanel.Draw(window);
+		window.draw(title);
+		window.draw(logo);
 
 		window.display();
 	}
