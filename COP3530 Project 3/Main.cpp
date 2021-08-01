@@ -168,7 +168,7 @@ int main() {
 	
 	CarData data;
 	data.page_url = "https://auburn.craigslist.org";
-	data.image_url = "https://images.craigslist.org/00j0j_46QKtC4X2ouz_0cU09G_600x450.jpg";
+	data.image_url = "https://images.craigslist.org/01212_27x8ep9e6vPz_0CI0t2_600x450.jpg";
 	data.car_name = "Ford F-150";
 	data.car_VIN = "AJJS23298392AAKIQ";
 	data.car_price = "2402.67";

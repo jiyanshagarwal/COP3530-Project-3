@@ -16,6 +16,7 @@ SearchCard::SearchCard(float x, float y, float width, float height, CarData data
 
 	//This part load the image from the internet
 	if (ImageDownloader::DownloadImage("Find a Car", data.image_url, photo_image)) photo_texture.loadFromImage(photo_image);
+	else { photo_texture.loadFromFile("res\\Image_Failed_To_Load.png"); }
 }
 
 void SearchCard::Tick() {

@@ -1,9 +1,15 @@
 #include "ImageDownloader.h"
 #include <SFML/Graphics.hpp>
-#include <iostream>
 #include <vector>
 #include <Windows.h>
 #include <WinInet.h>
+
+struct ImageDownloader::HandleWrapper {
+	HINTERNET& handle;
+	HandleWrapper(HINTERNET& handle);
+};
+
+ImageDownloader::HandleWrapper::HandleWrapper(HINTERNET& handle) : handle(handle) {}
 
 bool ImageDownloader::DownloadImage(std::string app_name, std::string url, sf::Image& image) {
 	/*
@@ -33,32 +39,68 @@ bool ImageDownloader::DownloadImage(std::string app_name, std::string url, sf::I
 		);
 
 		if (internet_open_handle) {
-			std::vector<char> data;
-			const DWORD dwBytesToRead = 5000;
-			DWORD dwBytesRead = 0;
+			std::string status_code = GetHeaderAttribute(HandleWrapper(internet_open_handle), HTTP_QUERY_STATUS_CODE);
+			std::string content_type = GetHeaderAttribute(HandleWrapper(internet_open_handle), HTTP_QUERY_CONTENT_TYPE);
+			
+			if ((status_code == "200" || status_code == "304")
+				&& (content_type == "image/jpeg" || content_type == "image/jpg" || content_type == "image/png")) {
 
-			do {
-				const size_t old_size = data.size();
-				data.resize(data.size() + dwBytesToRead);
-
-				if (!InternetReadFile(internet_open_handle, &data[old_size], dwBytesToRead, &dwBytesRead)) { 
+				if (GetImage(HandleWrapper(internet_open_handle), image)) {
 					InternetCloseHandle(internet_open_handle);
 					InternetCloseHandle(session_handle);
-					return false;
+					return true;
 				}
-
-				data.resize(old_size + dwBytesRead);
-			} while (dwBytesRead != 0);
-
-			image.loadFromMemory(data.data(), data.size());
+			}
 
 			InternetCloseHandle(internet_open_handle);
-			InternetCloseHandle(session_handle);
-			return true;
 		}
 
 		InternetCloseHandle(session_handle);
 	}
 
 	return false;
+}
+
+std::string ImageDownloader::GetHeaderAttribute(const HandleWrapper& handle, int header_attribute) {
+	/*
+	* Because of the stupid way that HttpQueryInfo works.You have to first call it so that it can put the buffer size in dwSize.
+	* Then size your buffer correctly and re - call it. Thus, the goto statement is needed to run the code twice.
+	*/
+	std::vector<char> header_buffer;
+	DWORD dwSize = 0;
+
+retry:
+	if (!HttpQueryInfoA(handle.handle, header_attribute, header_buffer.data(), &dwSize, NULL)) {
+		if (GetLastError() == ERROR_INSUFFICIENT_BUFFER) {
+			header_buffer.resize(dwSize);
+			goto retry;
+		}
+		else {
+			return "";
+		}
+	}
+
+	if (header_buffer.back() == '\0') { header_buffer.pop_back(); }
+
+	return std::string(header_buffer.data(), header_buffer.size());
+}
+
+bool ImageDownloader::GetImage(const HandleWrapper& handle, sf::Image& image) {
+	std::vector<char> data;
+	const DWORD dwBytesToRead = 5000;
+	DWORD dwBytesRead = 0;
+
+	do {
+		const size_t old_size = data.size();
+		data.resize(data.size() + dwBytesToRead);
+
+		if (!InternetReadFile(handle.handle, &data[old_size], dwBytesToRead, &dwBytesRead)) {
+			return false;
+		}
+
+		data.resize(old_size + dwBytesRead);
+	} while (dwBytesRead != 0);
+
+	image.loadFromMemory(data.data(), data.size());
+	return true;
 }
