@@ -14,11 +14,10 @@
 #include "CardManager.h"
 #include "CarData.h"
 #include "ImageDownloader.h"
+#include "ResourceManager.h"
 
 using std::cout;
 using std::endl;
-using std::string;
-using std::vector;
 
 void menuClickTest(std::string name) {
 	cout << name << " clicked" << endl;
@@ -26,7 +25,7 @@ void menuClickTest(std::string name) {
 
 int main() {
 	DataReader reader;
-	reader.read("res\\small_vehicles_data.csv", 1000);
+	reader.read("res\\small_vehicles_data.csv", 10);
 
 	std::map<int, std::vector<CarData>> vehiclesByPrice;
 	std::map<std::string, std::vector<CarData>> vehiclesByBrand;
@@ -74,7 +73,7 @@ int main() {
 		vehiclesByPrice.insert(std::pair<int, std::vector<CarData>>(stoi(temp.car_price), DataVector));
 	}
 
-#pragma region <Load Fonts>
+#pragma region <Load Resources>
 	sf::Font arial_font;
 	cout << "Arial Font Loaded: " << arial_font.loadFromFile("res\\arial.TTF") << endl;
 
@@ -83,6 +82,9 @@ int main() {
 
 	sf::Font courier_font;
 	cout << "Courier Font Loaded: " << courier_font.loadFromFile("res\\Courier New.TTF") << endl;
+
+	sf::Texture image_loading_failed;
+	image_loading_failed.loadFromFile("res\\Image_Failed_To_Load.png");
 #pragma endregion
 
 #pragma region <Main Window Setup>
@@ -122,8 +124,6 @@ int main() {
 	logo.setTexture(&logo_texture);
 	logo.setPosition(10, 5);
 #pragma endregion
-
-
 
 #pragma region <Setup for the Side Menu>
 	NavigationMenu side_menu(0, 0, sideBar.GetWidth(), 30, arial_rounded_MT_bold);
@@ -173,7 +173,9 @@ int main() {
 	searchButton.SetTextColor(sf::Color::White);
 	searchButton.SetBorderColor(sf::Color::Black);
 
-	CardManager searchCards(50, 150, 730, 530, 200, arial_font, &window);
+	ResourceManager<sf::Texture> resources(window, arial_font, image_loading_failed);
+
+	CardManager searchCards(50, 150, 730, 530, 200, resources);
 	searchCards.SetColor(sf::Color(70, 70, 70));
 	searchCards.YScroll(true);
 	
@@ -185,12 +187,19 @@ int main() {
 	data.car_price = "2402.67";
 	data.car_description = "192k miles brand new TSLs 4x4 jeep xj. 4x4 works amazing. Hot heat, ac needs recharged. Text for more info. TEXT ONLY. Cash only!";
 
-	searchCards.AddCard(data);
-	searchCards.AddCard(data);
-	searchCards.AddCard(data);
+	//searchCards.AddCard(data);
 
-	sf::Image img;
-	ImageDownloader::DownloadImage("Find a Car", "https://images.craigslist.org/01010_7EM2aot64Gnz_0dp0t2_600x450.jpg", img);
+	for (auto vehicle : reader.vehicles) {
+		CarData data;
+		data.page_url = vehicle[DataReader::URL];
+		data.image_url = vehicle[DataReader::IMAGE_URL];
+		data.car_name = vehicle[DataReader::MANUFACTUERER] + " " + vehicle[DataReader::MODEL];
+		data.car_VIN = vehicle[DataReader::VIN];
+		data.car_price = vehicle[DataReader::PRICE];
+		data.car_description = vehicle[DataReader::DESCRIPTION];
+
+		searchCards.AddCard(data);
+	}
 
 #pragma endregion
 

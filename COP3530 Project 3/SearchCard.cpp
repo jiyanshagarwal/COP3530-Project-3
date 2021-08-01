@@ -2,12 +2,10 @@
 #include "ImageDownloader.h"
 #include <Windows.h>
 
-SearchCard::SearchCard(float x, float y, float width, float height, CarData data, const sf::Font& font, sf::RenderWindow* window)
-	: Drawable(x, y, width, height), window(window) {
+SearchCard::SearchCard(float x, float y, float width, float height, CarData data, const ResourceManager<sf::Texture>& resources)
+	: Drawable(x, y, width, height), resources(resources) {
 	this->data = data;
 	border_width = width / 50;
-	photo_texture.setSmooth(true);
-	this->font = font;
 	cursor_changed = false;
 
 	//This part adds newline characters to the string to make it fit in the box.
@@ -15,18 +13,21 @@ SearchCard::SearchCard(float x, float y, float width, float height, CarData data
 	this->data.car_description = StringWrap(data.car_description, description_space, 16);
 
 	//This part load the image from the internet
-	if (ImageDownloader::DownloadImage("Find a Car", data.image_url, photo_image)) photo_texture.loadFromImage(photo_image);
-	else { photo_texture.loadFromFile("res\\Image_Failed_To_Load.png"); }
+	if (ImageDownloader::DownloadImage("Find a Car", data.image_url, photo_texture)) {
+		photo_texture.setSmooth(true);
+		photo.setTexture(&photo_texture);
+	}
+	else { photo.setTexture(&resources.resource); }
 }
 
 void SearchCard::Tick() {
 	if (this->MouseInBounds(mouse_x, mouse_y) && cursor.loadFromSystem(sf::Cursor::Hand)) {
-		window->setMouseCursor(cursor);
+		resources.window.setMouseCursor(cursor);
 		cursor_changed = true;
 	}
 	else if (cursor_changed) {
 		cursor.loadFromSystem(sf::Cursor::Arrow);
-		window->setMouseCursor(cursor);
+		resources.window.setMouseCursor(cursor);
 		cursor_changed = false;
 	}
 }
@@ -46,8 +47,7 @@ void SearchCard::Draw(sf::RenderTarget& target) {
 	card.setOutlineColor(sf::Color::Black);
 	card.setOutlineThickness(3);
 
-	sf::RectangleShape photo(sf::Vector2f(width / 3, height - 2 * border_width));
-	photo.setTexture(&photo_texture);
+	photo.setSize(sf::Vector2f(width / 3, height - 2 * border_width));
 	photo.setPosition(x + border_width, y + border_width);
 
 	//------------------Change Color when Clicked------------------//
@@ -63,10 +63,10 @@ void SearchCard::Draw(sf::RenderTarget& target) {
 	}
 	//------------------------------------------------------------//
 
-	sf::Text name(data.car_name, font, 32);
-	sf::Text VIN(data.car_VIN, font, 12);
-	sf::Text price("$" + data.car_price, font, 24);
-	sf::Text description(data.car_description, font, 16);
+	sf::Text name(data.car_name, resources.font, 32);
+	sf::Text VIN(data.car_VIN, resources.font, 12);
+	sf::Text price("$" + data.car_price, resources.font, 24);
+	sf::Text description(data.car_description, resources.font, 16);
 
 	name.setPosition(photo.getPosition().x + photo.getSize().x + border_width, y + border_width);
 	VIN.setPosition(photo.getPosition().x + photo.getSize().x + border_width, y + border_width + 40);
@@ -84,7 +84,7 @@ void SearchCard::Draw(sf::RenderTarget& target) {
 }
 
 float SearchCard::GetTextWidth(std::string str, unsigned int character_size) const {
-	sf::Text text(str, font, character_size);
+	sf::Text text(str, resources.font, character_size);
 	return text.getGlobalBounds().width;
 }
 

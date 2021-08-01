@@ -1,11 +1,12 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include <Drawable.h>
+#include "ResourceManager.h"
 #include "CarData.h"
 
 class SearchCard : public Drawable {
 public:
-	SearchCard(float x, float y, float width, float height, CarData data, const sf::Font& font, sf::RenderWindow* window);
+	SearchCard(float x, float y, float width, float height, CarData data, const ResourceManager<sf::Texture>& resources);
 
 	void Tick() override;
 	void Event(sf::Event& event) override;
@@ -14,11 +15,10 @@ public:
 private:
 	CarData data;
 	int border_width;
-	sf::Image photo_image;
+	sf::RectangleShape photo;
 	sf::Texture photo_texture;
 
-	sf::RenderWindow* window;
-	sf::Font font;
+	const ResourceManager<sf::Texture>& resources;
 	sf::Cursor cursor;
 	bool cursor_changed;
 

@@ -11,7 +11,7 @@ struct ImageDownloader::HandleWrapper {
 
 ImageDownloader::HandleWrapper::HandleWrapper(HINTERNET& handle) : handle(handle) {}
 
-bool ImageDownloader::DownloadImage(std::string app_name, std::string url, sf::Image& image) {
+bool ImageDownloader::DownloadImage(std::string app_name, std::string url, sf::Texture& texture) {
 	/*
 	* The following pages were helpful for this:
 	* https://docs.microsoft.com/en-us/windows/win32/wininet/http-sessions
@@ -45,7 +45,7 @@ bool ImageDownloader::DownloadImage(std::string app_name, std::string url, sf::I
 			if ((status_code == "200" || status_code == "304")
 				&& (content_type == "image/jpeg" || content_type == "image/jpg" || content_type == "image/png")) {
 
-				if (GetImage(HandleWrapper(internet_open_handle), image)) {
+				if (GetImage(HandleWrapper(internet_open_handle), texture)) {
 					InternetCloseHandle(internet_open_handle);
 					InternetCloseHandle(session_handle);
 					return true;
@@ -85,7 +85,7 @@ retry:
 	return std::string(header_buffer.data(), header_buffer.size());
 }
 
-bool ImageDownloader::GetImage(const HandleWrapper& handle, sf::Image& image) {
+bool ImageDownloader::GetImage(const HandleWrapper& handle, sf::Texture& texture) {
 	std::vector<char> data;
 	const DWORD dwBytesToRead = 5000;
 	DWORD dwBytesRead = 0;
@@ -101,6 +101,6 @@ bool ImageDownloader::GetImage(const HandleWrapper& handle, sf::Image& image) {
 		data.resize(old_size + dwBytesRead);
 	} while (dwBytesRead != 0);
 
-	image.loadFromMemory(data.data(), data.size());
+	texture.loadFromMemory(data.data(), data.size());
 	return true;
 }
