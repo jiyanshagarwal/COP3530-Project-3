@@ -114,9 +114,11 @@ std::string SearchCard::StringWrap(std::string str, int max_lines, float width, 
 
 			if (newline_pos == std::string::npos) {
 				newline_pos = i * line_length;
+				str.insert(newline_pos + 1, "\n");
 			}
-
-			str[newline_pos] = '\n';
+			else {
+				str[newline_pos] = '\n';
+			}
 
 		}
 	}
