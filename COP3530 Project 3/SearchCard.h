@@ -14,6 +14,7 @@ public:
 private:
 	CarData data;
 	int border_width;
+	sf::Image photo_image;
 	sf::Texture photo_texture;
 
 	sf::RenderWindow* window;

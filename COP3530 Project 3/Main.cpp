@@ -13,6 +13,7 @@
 #include "DataReader.h"
 #include "CardManager.h"
 #include "CarData.h"
+#include "ImageDownloader.h"
 
 using std::cout;
 using std::endl;
@@ -145,6 +146,7 @@ int main() {
 	side_menu.OnClick("Brand.Toyota", menuClickTest);
 #pragma endregion
 
+#pragma region <Search Cards>
 	TextBox searchBox(50, 50, 600, 30, window);
 	searchBox.SetFont(courier_font);
 	searchBox.SetCharacterLimit(40);
@@ -166,6 +168,7 @@ int main() {
 	
 	CarData data;
 	data.page_url = "https://auburn.craigslist.org";
+	data.image_url = "https://images.craigslist.org/00j0j_46QKtC4X2ouz_0cU09G_600x450.jpg";
 	data.car_name = "Ford F-150";
 	data.car_VIN = "AJJS23298392AAKIQ";
 	data.car_price = "2402.67";
@@ -174,6 +177,11 @@ int main() {
 	searchCards.AddCard(data);
 	searchCards.AddCard(data);
 	searchCards.AddCard(data);
+
+	sf::Image img;
+	ImageDownloader::DownloadImage("Find a Car", "https://images.craigslist.org/01010_7EM2aot64Gnz_0dp0t2_600x450.jpg", img);
+
+#pragma endregion
 
 	panel.AddObject(&searchBox, 0);
 	panel.AddObject(&searchButton, 0);

@@ -1,4 +1,5 @@
 #include "SearchCard.h"
+#include "ImageDownloader.h"
 #include <Windows.h>
 
 SearchCard::SearchCard(float x, float y, float width, float height, CarData data, const sf::Font& font, sf::RenderWindow* window)
@@ -12,6 +13,9 @@ SearchCard::SearchCard(float x, float y, float width, float height, CarData data
 	//This part adds newline characters to the string to make it fit in the box.
 	float description_space = (2 * width / 3) - 3 * border_width;
 	this->data.car_description = StringWrap(data.car_description, description_space, 16);
+
+	//This part load the image from the internet
+	if (ImageDownloader::DownloadImage("Find a Car", data.image_url, photo_image)) photo_texture.loadFromImage(photo_image);
 }
 
 void SearchCard::Tick() {
