@@ -23,5 +23,5 @@ private:
 	bool cursor_changed;
 
 	float GetTextWidth(std::string str, unsigned int character_size) const;
-	std::string StringWrap(std::string str, float width, unsigned int character_size) const;
+	std::string StringWrap(std::string str, int max_lines, float width, unsigned int character_size) const;
 };

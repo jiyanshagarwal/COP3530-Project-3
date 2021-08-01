@@ -9,8 +9,12 @@ SearchCard::SearchCard(float x, float y, float width, float height, CarData data
 	cursor_changed = false;
 
 	//This part adds newline characters to the string to make it fit in the box.
-	float description_space = (2 * width / 3) - 3 * border_width;
-	this->data.car_description = StringWrap(data.car_description, description_space, 16);
+	float description_width = (2 * width / 3) - 3 * border_width;
+	float description_height = height - 2 * border_width - 90;
+	this->data.car_description = StringWrap(data.car_description, description_height / 16 - 1, description_width, 16);
+
+	float name_width = width - 3 * border_width - (width / 3) - 100;
+	this->data.car_name = StringWrap(data.car_name, 2, name_width, 32);
 
 	//This part load the image from the internet
 	if (ImageDownloader::DownloadImage("Find a Car", data.image_url, photo_texture)) {
@@ -69,11 +73,17 @@ void SearchCard::Draw(sf::RenderTarget& target) {
 	sf::Text description(data.car_description, resources.font, 16);
 
 	name.setPosition(photo.getPosition().x + photo.getSize().x + border_width, y + border_width);
-	VIN.setPosition(photo.getPosition().x + photo.getSize().x + border_width, y + border_width + 40);
-	price.setPosition(x + width - 130, y + border_width);
+	price.setPosition(x + width - 100, y + border_width);
 	description.setPosition(photo.getPosition().x + photo.getSize().x + border_width, y + border_width + 90);
 
 	price.setFillColor(sf::Color(252, 127, 0));
+
+	if (data.car_name.find('\n') != std::string::npos) {
+		VIN.setPosition(photo.getPosition().x + photo.getSize().x + border_width, y + border_width + 72);
+	}
+	else {
+		VIN.setPosition(photo.getPosition().x + photo.getSize().x + border_width, y + border_width + 40);
+	}
 
 	target.draw(card);
 	target.draw(photo);
@@ -88,13 +98,18 @@ float SearchCard::GetTextWidth(std::string str, unsigned int character_size) con
 	return text.getGlobalBounds().width;
 }
 
-std::string SearchCard::StringWrap(std::string str, float width, unsigned int character_size) const {
+std::string SearchCard::StringWrap(std::string str, int max_lines, float width, unsigned int character_size) const {
 	float str_width = GetTextWidth(str, character_size);
 
 	if (str_width > width) {
 		int line_length = std::floor(width * str.size() / str_width);
 
 		for (int i = 1; i * line_length < str.size(); i++) {
+			if (i == max_lines) {
+				str = str.substr(0, i * line_length);
+				return str;
+			}
+
 			int newline_pos = str.rfind(" ", i * line_length);
 
 			if (newline_pos == std::string::npos) {

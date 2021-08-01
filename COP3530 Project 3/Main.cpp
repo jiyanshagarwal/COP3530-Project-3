@@ -25,7 +25,7 @@ void menuClickTest(std::string name) {
 
 int main() {
 	DataReader reader;
-	reader.read("res\\small_vehicles_data.csv", 10);
+	reader.read("res\\small_vehicles_data.csv", 1000);
 
 	std::map<int, std::vector<CarData>> vehiclesByPrice;
 	std::map<std::string, std::vector<CarData>> vehiclesByBrand;
@@ -187,9 +187,10 @@ int main() {
 	data.car_price = "2402.67";
 	data.car_description = "192k miles brand new TSLs 4x4 jeep xj. 4x4 works amazing. Hot heat, ac needs recharged. Text for more info. TEXT ONLY. Cash only!";
 
-	//searchCards.AddCard(data);
+	searchCards.AddCard(data);
 
-	for (auto vehicle : reader.vehicles) {
+	for (int i = 1; i < reader.vehicles.size() && i < 10; i++) {
+		std::vector<std::string> vehicle = reader.vehicles[i];
 		CarData data;
 		data.page_url = vehicle[DataReader::URL];
 		data.image_url = vehicle[DataReader::IMAGE_URL];
