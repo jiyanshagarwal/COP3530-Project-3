@@ -13,6 +13,7 @@ public:
 	T& Front();
 	void Remove();
 
+	static void HeapSort(std::vector<T>& vec, bool is_min_heap = true);
 	unsigned int Size() const;
 	bool isMinHeap() const;
 	void Clear();
@@ -24,11 +25,19 @@ private:
 
 	bool Compare(T& item1, T& item2) const;
 	void HeapifyDown(unsigned int index);
+
+	static bool Compare(T& item1, T& item2, bool is_min_heap);
+	static void HeapifyDown(std::vector<T>& vec, unsigned int size, unsigned int index, bool is_min_heap);
 };
 
 template <typename T>
-BinaryHeap<T>::BinaryHeap(bool is_min_heap) : is_min_heap(is_min_heap) {
-	size = 0;
+BinaryHeap<T>::BinaryHeap(bool is_min_heap) : is_min_heap(is_min_heap), size(0) {}
+
+template <typename T>
+BinaryHeap<T>::BinaryHeap(std::vector<T> vec, bool is_min_heap) : heap(vec), is_min_heap(is_min_heap), size(vec.size()) {
+	for (int i = size / 2; i >= 0; i--) {
+		HeapifyDown(i);
+	}
 }
 
 template <typename T>
@@ -65,24 +74,22 @@ void BinaryHeap<T>::Remove() {
 	heap[0] = heap[size - 1];
 	size--;
 
-	unsigned int parent = 0;
-	unsigned int left_child = 1;
-	unsigned int right_child = 2;
+	HeapifyDown(0);
+}
 
-	while (left_child < size) {
-		int favored_child = Compare(heap[left_child], heap[right_child]) ? left_child : right_child;
+template <typename T>
+void BinaryHeap<T>::HeapSort(std::vector<T>& vec, bool is_min_heap) {
+	//The process of sorting results in a reversed array, so is_min_heap is negated.
+	for (int i = vec.size() / 2; i >= 0; i--) {
+		HeapifyDown(vec, vec.size(), i, !is_min_heap);
+	}
 
-		//Note that the order matters here. By putting parent second, we are effectively asking the OPPOSITE of what the heap type is.
-		//E.g. if its a min heap, then we are asking when parent is GREATER THAN favored_child
-		if (Compare(heap[favored_child], heap[parent])) {
-			std::swap(heap[parent], heap[favored_child]);
-			parent = favored_child;
-			left_child = 2 * parent + 1;
-			right_child = left_child + 1;
-		}
-		else {
-			break;
-		}
+	int size = vec.size();
+
+	for (int i = 0; i < vec.size(); i++) {
+		std::swap(vec[0], vec[size - 1]);
+		size--;
+		HeapifyDown(vec, size, 0, !is_min_heap);
 	}
 }
 
@@ -106,5 +113,46 @@ template <typename T>
 bool BinaryHeap<T>::Compare(T& item1, T& item2) const {
 	if (is_min_heap) return item1 < item2;
 	else return item1 > item2;
+}
 
+template <typename T>
+void BinaryHeap<T>::HeapifyDown(unsigned int index) {
+	int parent = index;
+	int favored = parent;
+
+	do {
+		parent = favored;
+		int left_child = 2 * parent + 1;
+		int right_child = left_child + 1;
+
+		if (left_child < size && Compare(heap[left_child], heap[favored])) favored = left_child;
+		if (right_child < size && Compare(heap[right_child], heap[favored])) favored = right_child;
+
+		std::swap(heap[parent], heap[favored]);
+
+	} while (favored != parent);
+}
+
+template <typename T>
+bool BinaryHeap<T>::Compare(T& item1, T& item2, bool is_min_heap) {
+	if (is_min_heap) return item1 < item2;
+	else return item1 > item2;
+}
+
+template <typename T>
+void BinaryHeap<T>::HeapifyDown(std::vector<T>& vec, unsigned int size, unsigned int index, bool is_min_heap) {
+	int parent = index;
+	int favored = parent;
+
+	do {
+		parent = favored;
+		int left_child = 2 * parent + 1;
+		int right_child = left_child + 1;
+
+		if (left_child < size && Compare(vec[left_child], vec[favored], is_min_heap)) favored = left_child;
+		if (right_child < size && Compare(vec[right_child], vec[favored], is_min_heap)) favored = right_child;
+
+		std::swap(vec[parent], vec[favored]);
+
+	} while (favored != parent);
 }
