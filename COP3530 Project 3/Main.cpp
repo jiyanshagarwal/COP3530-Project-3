@@ -25,7 +25,7 @@ void menuClickTest(std::string name) {
 
 int main() {
 	DataReader reader;
-	reader.read("res\\small_vehicles_data.csv", 1000);
+	reader.read("res\\small_vehicles_data.csv", 10);
 	ImageDownloader images("Find a Car", reader.vehicles);
 
 	std::map<int, std::vector<CarData>> vehiclesByPrice;
