@@ -22,14 +22,18 @@ ImageDownloader::ImageDownloader(std::string app_name, std::vector<std::vector<s
 		images.push_back(std::make_tuple(image_url, false, std::vector<char>()));
 	}
 
+	image_loading_failed_image.loadFromFile("res\\Image_Failed_To_Load.png");
+	image_loading_failed_image.setSmooth(true);
+
 	downloader_thread = std::thread(&ImageDownloader::DownloadAllImages, this);
 }
 
 ImageDownloader::~ImageDownloader() {
+	end_thread = true;
 	downloader_thread.join();
 }
 
-bool ImageDownloader::GetImage(std::string image_url, sf::Texture& texture) {
+bool ImageDownloader::GetImage(std::string image_url, sf::Texture& texture) const {
 	try {
 		int index = url_to_image_map.at(image_url);
 
@@ -38,7 +42,7 @@ bool ImageDownloader::GetImage(std::string image_url, sf::Texture& texture) {
 			bool image_loaded = std::get<1>(images[index]);
 
 			if (image_loaded) {
-				std::vector<char>& image_data = std::get<2>(images[index]);
+				const std::vector<char>& image_data = std::get<2>(images[index]);
 				texture.loadFromMemory(image_data.data(), image_data.size());
 				return true;
 			}
@@ -103,6 +107,7 @@ bool ImageDownloader::DownloadImage(std::string app_name, std::string url, sf::T
 
 void ImageDownloader::DownloadAllImages() {
 	for (unsigned int i = 0; i < images.size(); i++) {
+		if (end_thread) return;
 		std::string image_url = std::get<0>(images[i]);
 		std::get<1>(images[i]) = DownloadImage(image_url, std::get<2>(images[i]));
 		loaded_index++;

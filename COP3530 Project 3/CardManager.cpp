@@ -1,6 +1,7 @@
 #include "CardManager.h"
+#include "SearchCard.h"
 
-CardManager::CardManager(float x, float y, float width, float height, float card_height, const ResourceManager<sf::Texture>& resources)
+CardManager::CardManager(float x, float y, float width, float height, float card_height, const ResourceManager<ImageDownloader>& resources)
 	: Panel(x, y, width, height), resources(resources) {
 	prev_card_y = -card_height - 15;
 	this->card_height = card_height;

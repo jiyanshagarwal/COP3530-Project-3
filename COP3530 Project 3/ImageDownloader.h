@@ -10,12 +10,14 @@
 
 class ImageDownloader {
 public:
+	sf::Texture image_loading_failed_image;
+
 	ImageDownloader(std::string app_name, std::vector<std::vector<std::string>>& vehicles);
 	ImageDownloader(const ImageDownloader& ref) = delete;
 	ImageDownloader& operator=(const ImageDownloader& ref) = delete;
 	~ImageDownloader();
 
-	bool GetImage(std::string image_url, sf::Texture& texture);
+	bool GetImage(std::string image_url, sf::Texture& texture) const;
 	static bool DownloadImage(std::string app_name, std::string url, sf::Texture& texture);
 
 private:
@@ -23,10 +25,12 @@ private:
 
 	std::unordered_map<std::string, int> url_to_image_map;
 	std::vector<std::tuple<std::string, bool, std::vector<char>>> images;
+
+	std::atomic<bool> end_thread;
 	std::atomic<int> loaded_index;
 	std::thread downloader_thread;
 
-	std::string app_name;
+	std::string app_name;	
 
 	void DownloadAllImages();
 	static std::string GetHeaderAttribute(const HandleWrapper& handle, int header_attribute);

@@ -26,6 +26,7 @@ void menuClickTest(std::string name) {
 int main() {
 	DataReader reader;
 	reader.read("res\\small_vehicles_data.csv", 1000);
+	ImageDownloader images("Find a Car", reader.vehicles);
 
 	std::map<int, std::vector<CarData>> vehiclesByPrice;
 	std::map<std::string, std::vector<CarData>> vehiclesByBrand;
@@ -52,7 +53,7 @@ int main() {
 		temp.car_description.append(it[description]);
 		temp.image_url.append(it[image_url]);
 		temp.page_url.append(it[page_url]);
-
+		
 		if (!vehiclesByBrand.count(it[manufactuerer])) {
 			DataVector.push_back(temp);
 		}
@@ -82,9 +83,6 @@ int main() {
 
 	sf::Font courier_font;
 	cout << "Courier Font Loaded: " << courier_font.loadFromFile("res\\Courier New.TTF") << endl;
-
-	sf::Texture image_loading_failed;
-	image_loading_failed.loadFromFile("res\\Image_Failed_To_Load.png");
 #pragma endregion
 
 #pragma region <Main Window Setup>
@@ -173,7 +171,7 @@ int main() {
 	searchButton.SetTextColor(sf::Color::White);
 	searchButton.SetBorderColor(sf::Color::Black);
 
-	ResourceManager<sf::Texture> resources(window, arial_font, image_loading_failed);
+	ResourceManager<ImageDownloader> resources(window, arial_font, images);
 
 	CardManager searchCards(50, 150, 730, 530, 200, resources);
 	searchCards.SetColor(sf::Color(70, 70, 70));

@@ -2,11 +2,12 @@
 #include "ImageDownloader.h"
 #include <Windows.h>
 
-SearchCard::SearchCard(float x, float y, float width, float height, CarData data, const ResourceManager<sf::Texture>& resources)
+SearchCard::SearchCard(float x, float y, float width, float height, CarData data, const ResourceManager<ImageDownloader>& resources)
 	: Drawable(x, y, width, height), resources(resources) {
 	this->data = data;
 	border_width = width / 50;
 	cursor_changed = false;
+	image_downloaded = false;
 
 	//This part adds newline characters to the string to make it fit in the box.
 	float description_width = (2 * width / 3) - 3 * border_width;
@@ -16,12 +17,7 @@ SearchCard::SearchCard(float x, float y, float width, float height, CarData data
 	float name_width = width - 3 * border_width - (width / 3) - 100;
 	this->data.car_name = StringWrap(data.car_name, 2, name_width, 32);
 
-	//This part load the image from the internet
-	if (ImageDownloader::DownloadImage("Find a Car", data.image_url, photo_texture)) {
-		photo_texture.setSmooth(true);
-		photo.setTexture(&photo_texture);
-	}
-	else { photo.setTexture(&resources.resource); }
+	photo.setTexture(&resources.resource.image_loading_failed_image);
 }
 
 void SearchCard::Tick() {
@@ -33,6 +29,14 @@ void SearchCard::Tick() {
 		cursor.loadFromSystem(sf::Cursor::Arrow);
 		resources.window.setMouseCursor(cursor);
 		cursor_changed = false;
+	}
+
+	if (!image_downloaded) {
+		if (resources.resource.GetImage(data.image_url, photo_texture)) { 
+			photo_texture.setSmooth(true);
+			photo.setTexture(&photo_texture, true);
+			image_downloaded = true; 
+		}
 	}
 }
 
