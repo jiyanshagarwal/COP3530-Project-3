@@ -21,19 +21,21 @@ private:
 
 	Node* BSTinsert(Node*& root, Node* parent, Node* data);
 
-	void rotateLeft(Node*&, Node*&);
-	void rotateRight(Node*&, Node*&);
-	void fixViolation(Node*&, Node*&);
+	void rotateLeft(Node*& node);
+	void rotateRight(Node*& node);
+	void fixViolation(Node* node);
 
-	T search(Node* root, K key);
-	void inOrder(Node* root, std::vector<T>& data);
+	T search(Node* root, K key) const;
+	void inOrder(Node* root, std::vector<T>& data) const;
+
+	Node* getUncle(Node* node) const;
 
 public:
 	RBTree() { root = nullptr; }
 	~RBTree() { delete root; }
 	void insert(K key, T data);
-	bool search(K key);
-	void inOrder(std::vector<T>& data);
+	bool search(K key) const;
+	void inOrder(std::vector<T>& data) const;
 };
 
 template <typename K, typename T>
@@ -59,11 +61,12 @@ typename RBTree<K, T>::Node* RBTree<K, T>::BSTinsert(Node*& root, Node* parent, 
 	}
 
 	if (data->key < root->key) return BSTinsert(root->left, root, data);
-	return BSTinsert(root->right, root, data);
+	if (data->key > root->key) return BSTinsert(root->right, root, data);
+	return root;	//if keys are equal
 }
 
 template <typename K, typename T>
-T RBTree<K, T>::search(Node* root, K key) {
+T RBTree<K, T>::search(Node* root, K key) const {
 	if (root == nullptr) throw std::out_of_range("Root is nullptr");
 
 	if (root->key == key) return root->data;
@@ -75,111 +78,65 @@ T RBTree<K, T>::search(Node* root, K key) {
 }
 
 template <typename K, typename T>
-bool RBTree<K, T>::search(K key) {
+bool RBTree<K, T>::search(K key) const {
 	return search(root, key);
 }
 
 template <typename K, typename T>
-void RBTree<K, T>::rotateLeft(Node*& root, Node*& data) {
-	Node* dataRight = data->right;
-	data->right = dataRight->left;
-
-	if (data->right != nullptr) {
-		data->right->parent = data;
-	}
-
-	dataRight->parent = data->parent;
-
-	if (data->parent == nullptr)
-		root = dataRight;
-
-	else if (data == data->parent->left)
-		data->parent->left = dataRight;
-
-	else
-		data->parent->right = dataRight;
-
-	dataRight->left = data;
-	data->parent = dataRight;
+void RBTree<K, T>::rotateLeft(Node*& node) {
+	//Referred to AVL lecture 4c
+	if (node == nullptr || node->right == nullptr) return;
+	Node* oldParent = node;
+	node = node->right;				//Changing the node reference itself.
+	oldParent->right = node->left;
+	node->left = oldParent;
 }
 
 template <typename K, typename T>
-void RBTree<K, T>::rotateRight(Node*& root, Node*& data) {
-	Node* dataLeft = data->left;
-	data->left = dataLeft->right;
-
-	if (data->left != nullptr)
-		data->left->parent = data;
-
-	dataLeft->parent = data->parent;
-
-	if (data->parent == nullptr)
-		root = dataLeft;
-
-	else if (data == data->parent->left)
-		data->parent->left = dataLeft;
-
-	else
-		data->parent->right = dataLeft;
-
-	dataLeft->right = data;
-	data->parent = dataLeft;
+void RBTree<K, T>::rotateRight(Node*& node) {
+	//Referred to AVL lecture 4c
+	if (node == nullptr || node->left == nullptr) return;
+	Node* oldParent = node;
+	node = node->left;				//Changing the node reference itself.
+	oldParent->left = node->right;
+	node->right = oldParent;
 }
 
 template <typename K, typename T>
-void RBTree<K, T>::fixViolation(Node*& root, Node*& car) {
-	if (root == nullptr || car == nullptr) return;
-
-	Node* parentCar = nullptr;
-	Node* grandCar = nullptr;
-
-	while ((car != root) && (car->color != Color::BLACK) && (car->parent->color == Color::RED)) {
-		parentCar = car->parent;
-		grandCar = car->parent->parent;
-
-		if (parentCar == grandCar->left) {
-			Node* uncleCar = grandCar->right;
-
-			if (uncleCar != nullptr && uncleCar->color == Color::RED) {
-				grandCar->color = Color::RED;
-				parentCar->color = Color::BLACK;
-				uncleCar->color = Color::BLACK;
-				car = grandCar;
-			}
-			else {
-				if (car == parentCar->right) {
-					rotateLeft(root, parentCar);
-					car = parentCar;
-					parentCar = car->parent;
-				}
-
-				rotateRight(root, grandCar);
-				std::swap(parentCar->color, grandCar->color);
-				car = parentCar;
-			}
-		}
-		else {
-			Node* uncleCar = grandCar->left;
-
-			if (uncleCar != nullptr && uncleCar->color == Color::RED) {
-				grandCar->color = Color::RED;
-				parentCar->color = Color::BLACK;
-				uncleCar->color = Color::BLACK;
-				car = grandCar;
-			}
-			else {
-				if (car == parentCar->left) {
-					rotateRight(root, parentCar);
-					car = parentCar;
-					parentCar = car->parent;
-				}
-
-				rotateLeft(root, grandCar);
-				std::swap(parentCar->color, grandCar->color);
-				car = parentCar;
-			}
-		}
+void RBTree<K, T>::fixViolation(Node* node) {
+	//Used Cheryl Red Black Tree lecture for help with pseudocode
+	if (node->parent == nullptr) {
+		node->color = Color::BLACK;
+		return;
 	}
+	if (node->parent->color == Color::BLACK) return;
+
+	Node* parent = node->parent;
+	Node* grandparent = node->parent->parent;
+	Node* uncle = getUncle(node);
+
+	if (uncle != nullptr && uncle->color == Color::RED) {
+		parent->color = uncle->color = Color::BLACK;
+		grandparent->color = Color::RED;
+		fixViolation(grandparent);
+		return;
+	}
+	if (node == parent->right && parent == grandparent->left) {
+		rotateLeft(parent);
+		node = parent;
+		parent = node->parent;
+	}
+	else if (node == parent->left && parent == grandparent->right) {
+		rotateRight(parent);
+		node = parent;
+		parent = node->parent;
+	}
+
+	parent->color = Color::BLACK;
+	grandparent->color = Color::RED;
+
+	if (node == parent->left) rotateRight(grandparent);
+	else rotateLeft(grandparent);
 
 	root->color = Color::BLACK;
 }
@@ -187,19 +144,28 @@ void RBTree<K, T>::fixViolation(Node*& root, Node*& car) {
 template <typename K, typename T>
 void RBTree<K, T>::insert(K key, T data) {
 	Node* node = BSTinsert(root, nullptr, new Node(key, data));
-	fixViolation(root, node);
+	fixViolation(node);
 }
 
 template <typename K, typename T>
-void RBTree<K, T>::inOrder(std::vector<T>& data) {
+void RBTree<K, T>::inOrder(std::vector<T>& data) const {
 	data.clear();
 	inOrder(root, data);
 }
 
 template <typename K, typename T>
-void RBTree<K, T>::inOrder(Node* root, std::vector<T>& data) {
+void RBTree<K, T>::inOrder(Node* root, std::vector<T>& data) const {
 	if (root == nullptr) return;
 	inOrder(root->left, data);
 	data.push_back(root->data);
 	inOrder(root->right, data);
+}
+
+template <typename K, typename T>
+typename RBTree<K, T>::Node* RBTree<K, T>::getUncle(Node* node) const {
+	if (node == nullptr || node->parent == nullptr || node->parent->parent == nullptr) return nullptr;
+
+	Node* grandparent = node->parent->parent;
+	if (grandparent->left == node->parent) return grandparent->right;
+	else return grandparent->left;
 }
