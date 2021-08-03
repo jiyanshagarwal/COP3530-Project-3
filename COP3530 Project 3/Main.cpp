@@ -15,6 +15,8 @@
 #include "CarData.h"
 #include "ImageDownloader.h"
 #include "ResourceManager.h"
+#include "BinaryHeap.h"
+#include "RBTree.h"
 
 using std::cout;
 using std::endl;
@@ -23,56 +25,36 @@ void menuClickTest(std::string name) {
 	cout << name << " clicked" << endl;
 }
 
-int main() {
-	DataReader reader;
-	reader.read("res\\small_vehicles_data.csv", 10);
-	ImageDownloader images("Find a Car", reader.vehicles);
+void search(RBTree<std::string, std::string>& tree, std::vector<std::pair<std::string, std::string>>& data, 
+	std::vector<std::string>* VINS_heap, CardManager* manager, TextBox* searchbox, int id) {
+	cout << "Search button clicked: " << id << endl;
 
-	std::map<int, std::vector<CarData>> vehiclesByPrice;
-	std::map<std::string, std::vector<CarData>> vehiclesByBrand;
+	tree.clear();
+	VINS_heap->clear();
 
-	DataReader::FieldIndex year = DataReader::YEAR;
-	DataReader::FieldIndex manufactuerer = DataReader::MANUFACTUERER;
-	DataReader::FieldIndex model = DataReader::MODEL;
-	DataReader::FieldIndex vin = DataReader::VIN;
-	DataReader::FieldIndex price = DataReader::PRICE;
-	DataReader::FieldIndex description = DataReader::DESCRIPTION;
-	DataReader::FieldIndex image_url = DataReader::IMAGE_URL;
-	DataReader::FieldIndex page_url = DataReader::URL;
-	
-	for (auto& it : reader.vehicles) {
-		CarData temp;
-		std::vector<CarData> DataVector;
-		temp.car_name.append(it[year]);
-		temp.car_name.append(" ");
-		temp.car_name.append(it[manufactuerer]);
-		temp.car_name.append(" ");
-		temp.car_name.append(it[model]);
-		temp.car_VIN.append(it[vin]);
-		temp.car_price.append(it[price]);
-		temp.car_description.append(it[description]);
-		temp.image_url.append(it[image_url]);
-		temp.page_url.append(it[page_url]);
-		
-		if (!vehiclesByBrand.count(it[manufactuerer])) {
-			DataVector.push_back(temp);
-		}
-		else {
-			DataVector = vehiclesByBrand.at(it[manufactuerer]);
-			DataVector.push_back(temp);
-		}
-		vehiclesByBrand.insert(std::pair<std::string, std::vector<CarData>>(temp.car_name, DataVector));
-		DataVector.clear();
+	std::vector<std::string> VINS_tree;
 
-		if (!vehiclesByPrice.count(stoi(it[price]))) {
-			DataVector.push_back(temp);
-		}
-		else {
-			DataVector = vehiclesByPrice.at(stoi(it[price]));
-			DataVector.push_back(temp);
-		}
-		vehiclesByPrice.insert(std::pair<int, std::vector<CarData>>(stoi(temp.car_price), DataVector));
+	for (int i = 0; i < data.size(); i++) {
+		tree.insert(data[i].first, data[i].second);
 	}
+
+	tree.inOrder(VINS_tree);
+
+	BinaryHeap<std::string, std::string>::HeapSort(data);
+
+	for (int i = 0; i < data.size(); i++) {
+		if (data[i].first.find(searchbox->GetText()) != std::string::npos) {
+			VINS_heap->push_back(data[i].second);
+		}
+	}
+	manager->UpdateCardsToShow();
+	
+	/*for (int i = 0; i < 30; i++) {
+		cout << "tree: " << VINS_tree[i] << "        " << "heap: " << VINS_heap[i] << endl;
+	}*/
+}
+
+int main() {
 
 #pragma region <Load Resources>
 	sf::Font arial_font;
@@ -123,6 +105,54 @@ int main() {
 	logo.setPosition(10, 5);
 #pragma endregion
 
+	DataReader reader;
+	reader.read("res\\small_vehicles_data.csv", 1000);
+	ImageDownloader images("Find a Car", reader.vehicles);
+
+	BinaryHeap<std::string, std::string> name_sorted_heap;
+	RBTree<std::string, std::string> name_sorted_tree;
+
+	std::unordered_map<std::string, CarData> data;
+
+	for (int i = 0; i < reader.vehicles.size(); i++) {
+		std::vector<std::string> vehicle = reader.vehicles[i];
+		CarData car;
+		car.page_url = vehicle[DataReader::URL];
+		car.image_url = vehicle[DataReader::IMAGE_URL];
+		car.car_name = vehicle[DataReader::MANUFACTUERER] + " " + vehicle[DataReader::MODEL];
+		car.car_VIN = vehicle[DataReader::VIN];
+		car.car_price = vehicle[DataReader::PRICE];
+		car.car_description = vehicle[DataReader::DESCRIPTION];
+
+		data.emplace(car.car_VIN, car);
+	}
+
+	std::vector<std::pair<std::string, std::string>> names_VINS;
+
+	for (auto iter = data.begin(); iter != data.end(); iter++) {
+		names_VINS.push_back(std::make_pair(iter->second.car_name, iter->first));
+	}
+
+	std::vector<std::string> VINS_heap;
+	ResourceManager<ImageDownloader> resources(window, arial_font, images);
+
+	CardManager searchCards(50, 150, 730, 530, 200, VINS_heap, resources);
+	searchCards.SetColor(sf::Color(70, 70, 70));
+	searchCards.YScroll(true);
+	
+	for (int i = 1; i < reader.vehicles.size(); i++) {
+		std::vector<std::string> vehicle = reader.vehicles[i];
+		CarData data;
+		data.page_url = vehicle[DataReader::URL];
+		data.image_url = vehicle[DataReader::IMAGE_URL];
+		data.car_name = vehicle[DataReader::MANUFACTUERER] + " " + vehicle[DataReader::MODEL];
+		data.car_VIN = vehicle[DataReader::VIN];
+		data.car_price = vehicle[DataReader::PRICE];
+		data.car_description = vehicle[DataReader::DESCRIPTION];
+
+		searchCards.AddCard(data);
+	}
+
 #pragma region <Setup for the Side Menu>
 	NavigationMenu side_menu(0, 0, sideBar.GetWidth(), 30, arial_rounded_MT_bold);
 	side_menu.SetName("Filter");
@@ -170,35 +200,26 @@ int main() {
 	searchButton.SetColor(sf::Color(252, 127, 0));
 	searchButton.SetTextColor(sf::Color::White);
 	searchButton.SetBorderColor(sf::Color::Black);
+	searchButton.OnClick(std::bind(search, name_sorted_tree, names_VINS, &VINS_heap, &searchCards, &searchBox, std::placeholders::_1));
 
-	ResourceManager<ImageDownloader> resources(window, arial_font, images);
+	std::vector<std::string> vec;
 
-	CardManager searchCards(50, 150, 730, 530, 200, resources);
-	searchCards.SetColor(sf::Color(70, 70, 70));
-	searchCards.YScroll(true);
-	
-	CarData data;
-	data.page_url = "https://auburn.craigslist.org";
-	data.image_url = "https://images.craigslist.org/01212_27x8ep9e6vPz_0CI0t2_600x450.jpg";
-	data.car_name = "Ford F-150";
-	data.car_VIN = "AJJS23298392AAKIQ";
-	data.car_price = "2402.67";
-	data.car_description = "192k miles brand new TSLs 4x4 jeep xj. 4x4 works amazing. Hot heat, ac needs recharged. Text for more info. TEXT ONLY. Cash only!";
+	RBTree<int, std::string> tree;
+	tree.insert(1, "A");
+	tree.insert(4, "D");
+	tree.insert(3, "C");
+	tree.insert(5, "E");
+	tree.insert(6, "F");
+	tree.insert(7, "G");
+	tree.insert(8, "H");
+	tree.insert(9, "I");
 
-	searchCards.AddCard(data);
+	tree.inOrder(vec);
 
-	for (int i = 1; i < reader.vehicles.size() && i < 10; i++) {
-		std::vector<std::string> vehicle = reader.vehicles[i];
-		CarData data;
-		data.page_url = vehicle[DataReader::URL];
-		data.image_url = vehicle[DataReader::IMAGE_URL];
-		data.car_name = vehicle[DataReader::MANUFACTUERER] + " " + vehicle[DataReader::MODEL];
-		data.car_VIN = vehicle[DataReader::VIN];
-		data.car_price = vehicle[DataReader::PRICE];
-		data.car_description = vehicle[DataReader::DESCRIPTION];
-
-		searchCards.AddCard(data);
+	for (std::string str : vec) {
+		cout << str << " ";
 	}
+	cout << endl;
 
 #pragma endregion
 
@@ -223,7 +244,7 @@ int main() {
 		else {
 			windowPanel.SetBorderColor(unfocused_color);
 		}
-
+		
 		window.clear();
 
 		windowPanel.SetMousePosition((float)sf::Mouse::getPosition(window).x, (float)sf::Mouse::getPosition(window).y);
