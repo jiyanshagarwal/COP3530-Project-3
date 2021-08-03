@@ -7,6 +7,7 @@
 #include <Button.h>
 #include <TextBox.h>
 #include <Panel.h>
+#include <chrono>
 #include <DropdownMenu.h>
 #include <NavigationMenu.h>
 #include <TitleBar.h>
@@ -32,6 +33,8 @@ void search(RBTree<std::string, std::string>& tree, std::vector<std::pair<std::s
 	tree.clear();
 	VINS_heap->clear();
 
+	auto start = std::chrono::high_resolution_clock::now();
+
 	std::vector<std::string> VINS_tree;
 
 	for (int i = 0; i < data.size(); i++) {
@@ -40,6 +43,13 @@ void search(RBTree<std::string, std::string>& tree, std::vector<std::pair<std::s
 
 	tree.inOrder(VINS_tree);
 
+	auto stop = std::chrono::high_resolution_clock::now();
+	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+
+	cout << "Red-Black tree took " << duration.count() << " milliseconds.\n";
+
+	start = std::chrono::high_resolution_clock::now();
+
 	BinaryHeap<std::string, std::string>::HeapSort(data);
 
 	for (int i = 0; i < data.size(); i++) {
@@ -47,6 +57,13 @@ void search(RBTree<std::string, std::string>& tree, std::vector<std::pair<std::s
 			VINS_heap->push_back(data[i].second);
 		}
 	}
+
+	stop = std::chrono::high_resolution_clock::now();
+	duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+
+	cout << "heap took " << duration.count() << " milliseconds.\n";
+
+
 	manager->UpdateCardsToShow();
 	
 	/*for (int i = 0; i < 30; i++) {
