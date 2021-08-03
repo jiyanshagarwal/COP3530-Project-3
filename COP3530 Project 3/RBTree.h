@@ -36,6 +36,7 @@ public:
 	void insert(K key, T data);
 	bool search(K key) const;
 	void inOrder(std::vector<T>& data) const;
+	void clear();
 };
 
 template <typename K, typename T>
@@ -162,6 +163,11 @@ template <typename K, typename T>
 void RBTree<K, T>::inOrder(std::vector<T>& data) const {
 	data.clear();
 	inOrder(root, data);
+}
+
+template <typename K, typename T>
+void RBTree<K, T>::clear() {
+	delete root;
 }
 
 template <typename K, typename T>
