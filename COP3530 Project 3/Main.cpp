@@ -44,7 +44,7 @@ void search(RBTree<std::string, std::string>& tree, std::vector<std::pair<std::s
 	tree.inOrder(VINS_tree);
 
 	auto stop = std::chrono::high_resolution_clock::now();
-	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
 
 	cout << "Red-Black tree took " << duration.count() << " milliseconds.\n";
 
@@ -59,16 +59,53 @@ void search(RBTree<std::string, std::string>& tree, std::vector<std::pair<std::s
 	}
 
 	stop = std::chrono::high_resolution_clock::now();
-	duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+	duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
 
 	cout << "heap took " << duration.count() << " milliseconds.\n";
 
 
 	manager->UpdateCardsToShow();
-	
-	/*for (int i = 0; i < 30; i++) {
-		cout << "tree: " << VINS_tree[i] << "        " << "heap: " << VINS_heap[i] << endl;
-	}*/
+}
+
+void searchPrice(RBTree<double, std::string>& tree, std::vector<std::pair<double, std::string>>& data,
+	std::vector<std::string>* VINS_heap, CardManager* manager, TextBox* searchbox, int id) {
+	cout << "Search button clicked: " << id << endl;
+
+	tree.clear();
+	VINS_heap->clear();
+
+	auto start = std::chrono::high_resolution_clock::now();
+
+	std::vector<std::string> VINS_tree;
+
+	for (int i = 0; i < data.size(); i++) {
+		tree.insert(data[i].first, data[i].second);
+	}
+
+	tree.inOrder(VINS_tree);
+
+	auto stop = std::chrono::high_resolution_clock::now();
+	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+
+	cout << "Red-Black tree took " << duration.count() << " milliseconds.\n";
+
+	start = std::chrono::high_resolution_clock::now();
+
+	BinaryHeap<double, std::string>::HeapSort(data, false);
+
+	for (int i = 0; i < data.size(); i++) {
+		if (data[i].first < std::stoi(searchbox->GetText())) {
+			VINS_heap->push_back(data[i].second);
+		}
+	}
+
+	stop = std::chrono::high_resolution_clock::now();
+	duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+
+	cout << "heap took " << duration.count() << " milliseconds.\n";
+
+
+	manager->UpdateCardsToShow();
 }
 
 int main() {
@@ -123,11 +160,11 @@ int main() {
 #pragma endregion
 
 	DataReader reader;
-	reader.read("res\\small_vehicles_data.csv", 1000);
+	reader.read("res\\small_vehicles_data.csv", 1400);
 	ImageDownloader images("Find a Car", reader.vehicles);
 
-	BinaryHeap<std::string, std::string> name_sorted_heap;
 	RBTree<std::string, std::string> name_sorted_tree;
+	RBTree<double, std::string> price_sorted_tree;
 
 	std::unordered_map<std::string, CarData> data;
 
@@ -148,6 +185,12 @@ int main() {
 
 	for (auto iter = data.begin(); iter != data.end(); iter++) {
 		names_VINS.push_back(std::make_pair(iter->second.car_name, iter->first));
+	}
+
+	std::vector<std::pair<double, std::string>> prices_VINS;
+
+	for (auto iter = data.begin(); iter != data.end(); iter++) {
+		prices_VINS.push_back(std::make_pair(std::stoi(iter->second.car_price), iter->first));
 	}
 
 	std::vector<std::string> VINS_heap;
@@ -211,7 +254,7 @@ int main() {
 	searchBox.SetBorderColor(sf::Color::Black);
 	searchBox.SetHighlightColor(sf::Color(100, 150, 180, 150));
 
-	Button searchButton(680, 50, 100, 30);
+	Button searchButton(680, 30, 100, 30);
 	searchButton.SetText("Search");
 	searchButton.SetFont(arial_rounded_MT_bold);
 	searchButton.SetColor(sf::Color(252, 127, 0));
@@ -219,29 +262,19 @@ int main() {
 	searchButton.SetBorderColor(sf::Color::Black);
 	searchButton.OnClick(std::bind(search, name_sorted_tree, names_VINS, &VINS_heap, &searchCards, &searchBox, std::placeholders::_1));
 
-	std::vector<std::string> vec;
-
-	RBTree<int, std::string> tree;
-	tree.insert(1, "A");
-	tree.insert(4, "D");
-	tree.insert(3, "C");
-	tree.insert(5, "E");
-	tree.insert(6, "F");
-	tree.insert(7, "G");
-	tree.insert(8, "H");
-	tree.insert(9, "I");
-
-	tree.inOrder(vec);
-
-	for (std::string str : vec) {
-		cout << str << " ";
-	}
-	cout << endl;
+	Button searchButtonPrice(680, 80, 130, 30);
+	searchButtonPrice.SetText("Search Price");
+	searchButtonPrice.SetFont(arial_rounded_MT_bold);
+	searchButtonPrice.SetColor(sf::Color(252, 127, 0));
+	searchButtonPrice.SetTextColor(sf::Color::White);
+	searchButtonPrice.SetBorderColor(sf::Color::Black);
+	searchButtonPrice.OnClick(std::bind(searchPrice, price_sorted_tree, prices_VINS, &VINS_heap, &searchCards, &searchBox, std::placeholders::_1));
 
 #pragma endregion
 
 	panel.AddObject(&searchBox, 0);
 	panel.AddObject(&searchButton, 0);
+	panel.AddObject(&searchButtonPrice, 0);
 	panel.AddObject(&searchCards, 0);
 	sideBar.AddObject(&side_menu, 0);
 
