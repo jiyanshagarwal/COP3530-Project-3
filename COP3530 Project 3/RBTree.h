@@ -105,6 +105,7 @@ void RBTree<K, T>::rotateRight(Node*& node) {
 template <typename K, typename T>
 void RBTree<K, T>::fixViolation(Node* node) {
 	//Used Cheryl Red Black Tree lecture for help with pseudocode
+	//Also used: https://www.youtube.com/watch?v=qA02XWRTBdw
 	if (node->parent == nullptr) {
 		node->color = Color::BLACK;
 		return;
@@ -121,30 +122,40 @@ void RBTree<K, T>::fixViolation(Node* node) {
 		fixViolation(grandparent);
 		return;
 	}
-	if (node == parent->right && parent == grandparent->left) {
-		rotateLeft(parent);
-		node = parent;
-		parent = node->parent;
+	
+	if (parent == grandparent->left) {
+		if (node == parent->left) {				//Left-Left case
+			rotateRight(grandparent);
+			parent->color = Color::BLACK;
+			parent->right->color = Color::RED;
+		}
+		else {									//Left-Right case
+			rotateLeft(parent);
+			rotateLeft(grandparent);
+			parent->color = Color::BLACK;
+			parent->right->color = Color::RED;
+		}
 	}
-	else if (node == parent->left && parent == grandparent->right) {
-		rotateRight(parent);
-		node = parent;
-		parent = node->parent;
+	else {
+		if (node == parent->left) {				//Right-Left case
+			rotateRight(parent);
+			rotateLeft(grandparent);
+			parent->color = Color::BLACK;
+			parent->left->color = Color::RED;
+		}
+		else {									//Right-Right case
+			rotateLeft(grandparent);
+			parent->color = Color::BLACK;
+			parent->left->color = Color::RED;
+		}
 	}
 
-	parent->color = Color::BLACK;
-	grandparent->color = Color::RED;
-
-	if (node == parent->left) rotateRight(grandparent);
-	else rotateLeft(grandparent);
-
-	root->color = Color::BLACK;
 }
 
 template <typename K, typename T>
 void RBTree<K, T>::insert(K key, T data) {
 	Node* node = BSTinsert(root, nullptr, new Node(key, data));
-	fixViolation(node);
+	//fixViolation(node);
 }
 
 template <typename K, typename T>
